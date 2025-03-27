@@ -66,7 +66,7 @@ export default function TextProcessor() {
         id="input"
         value={inputText}
         onChange={(e) => setInputText(e.target.value)}
-        className="w-full h-32 p-4 border mt-12 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+        className="w-full h-32 p-4 border mt-12 bg-gray-700 text-white border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
         placeholder="Introduce el texto aquí..."
         />
       </div>
@@ -94,7 +94,7 @@ export default function TextProcessor() {
           >
             x
           </button>
-          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="p-4 bg-gray-700 text-white rounded-lg border border-gray-200">
             <div dangerouslySetInnerHTML={{ __html: processedText }} />
           </div>
         </div>
