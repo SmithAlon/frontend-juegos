@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import quickReading from '../assets/QuickReading-bg-removebg-preview.png';
-import {motion , AnimatePresence} from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface ProcessedText {
   text: string;
@@ -29,9 +29,7 @@ export default function TextProcessor() {
     setError(null);
 
     try {
-      const response = await axios.post<ProcessedText>('http://localhost:5000/process', {
-        text: inputText
-      });
+      const response = await axios.post<{ text: string }>('https://quickreading-backend.onrender.com/process', { text: inputText });
 
       setProcessedText(response.data.text);
     } catch (err) {
