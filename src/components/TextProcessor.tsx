@@ -3,16 +3,12 @@ import axios from 'axios';
 import quickReading from '../assets/QuickReading-bg-removebg-preview.png';
 import { motion } from 'framer-motion';
 
-interface ProcessedText {
-  text: string;
-}
-
 export default function TextProcessor() {
   const [inputText, setInputText] = useState('');
   const [processedText, setProcessedText] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isFocused, setIsFocused] = useState(false);
+  const [, setIsFocused] = useState(false);
 
   // Función para limpiar el texto
   const handleClear = () => {
