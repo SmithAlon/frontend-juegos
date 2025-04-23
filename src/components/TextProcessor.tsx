@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import quickReading from '../assets/QuickReading-bg-removebg-preview.png';
 import { motion } from 'framer-motion';
+import { QuickReadingApi } from '../client';
 
 export default function TextProcessor() {
   const [inputText, setInputText] = useState('');
@@ -20,17 +21,29 @@ export default function TextProcessor() {
       setError('Por favor, introduce algún texto para procesar.');
       return;
     }
-
+  
     setIsLoading(true);
     setError(null);
-
+  
     try {
-      const response = await axios.post<{ text: string }>('https://quickreading-backend.onrender.com/process', { text: inputText });
-
+      // Log the API endpoint for debugging
+      console.log('Requesting API:', `${QuickReadingApi}/process`);
+      
+      const response = await axios.post<{ text: string }>(
+        `${QuickReadingApi}/process`, 
+        { text: inputText }
+      );
+  
       setProcessedText(response.data.text);
     } catch (err) {
-      setError('Error al procesar el texto. Por favor, intenta de nuevo.');
       console.error('Error:', err);
+      
+      // More detailed error message based on error type
+      if ((err as any).isAxiosError) {
+        console.log('Error de Axios:', err);
+      } else {
+        setError('Error al procesar el texto. Por favor, intenta de nuevo.');
+      }
     } finally {
       setIsLoading(false);
     }
