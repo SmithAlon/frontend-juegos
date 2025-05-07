@@ -3,9 +3,8 @@ import { useState, useEffect } from 'react';
 import { apiClient } from '../client';
 import { useNavigate } from 'react-router-dom';
 
-interface UserData {
+interface LoginData {
   username: string;
-  email: string;
   password: string;
 }
 
@@ -14,11 +13,10 @@ interface UserResponse {
   email: string;
 }
 
-function Registro() {
+function InicioSesion() {
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState<UserData>({
+  const [formData, setFormData] = useState<LoginData>({
     username: '',
-    email: '',
     password: ''
   });
   const [status, setStatus] = useState<{ type: 'error' | 'success' | null; message: string }>({ type: null, message: '' });
@@ -38,22 +36,6 @@ function Registro() {
     checkServerConnection();
   }, []);
 
-  const validateForm = (): string | null => {
-    if (!formData.username || !formData.email || !formData.password) {
-      return 'Todos los campos son requeridos';
-    }
-    if (formData.password.length < 6) {
-      return 'La contraseña debe tener al menos 6 caracteres';
-    }
-    if (formData.username.length < 3) {
-      return 'El nombre de usuario debe tener al menos 3 caracteres';
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      return 'Por favor, ingresa un email válido';
-    }
-    return null;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus({ type: null, message: '' });
@@ -62,29 +44,25 @@ function Registro() {
     if (!isServerAvailable) {
       setStatus({ 
         type: 'error', 
-        message: 'El servidor no está disponible. Por favor, verifica que el servidor esté corriendo en http://localhost:5000' 
+        message: 'El servidor no está disponible' 
       });
       setIsLoading(false);
       return;
     }
 
-    const validationError = validateForm();
-    if (validationError) {
-      setStatus({ type: 'error', message: validationError });
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      const response = await apiClient.post<UserResponse>('/usuarios', formData);
+      const response = await apiClient.post<UserResponse>('/login', formData);
       
-      if (response.status === 201) {
-        setStatus({ type: 'success', message: 'Usuario registrado exitosamente' });
+      if (response.status === 200) {
+        setStatus({ type: 'success', message: 'Inicio de sesión exitoso' });
         localStorage.setItem('user', JSON.stringify(response.data));
-        setTimeout(() => navigate('/'), 2000);
+        setTimeout(() => navigate('/inicio'), 2000);
       }
     } catch (err: any) {
-      setStatus({ type: 'error', message: err.message });
+      setStatus({ 
+        type: 'error', 
+        message: err.response?.data?.detail || 'Error al iniciar sesión' 
+      });
       if (err.code === 'ERR_NETWORK') setIsServerAvailable(false);
     } finally {
       setIsLoading(false);
@@ -95,14 +73,7 @@ function Registro() {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <h2 className="text-xl font-semibold mb-4">Servidor no disponible</h2>
-        <p className="text-red-500 mb-4">No se pudo conectar con el servidor en http://localhost:5000</p>
-        <p className="text-sm text-gray-500 mb-4">Asegúrate de que:</p>
-        <ul className="text-sm text-gray-500 list-disc mb-4">
-          <li>El servidor FastAPI esté corriendo</li>
-          <li>MongoDB esté corriendo en el puerto 27017</li>
-          <li>El puerto 5000 esté disponible</li>
-          <li>CORS esté configurado correctamente en el servidor</li>
-        </ul>
+        <p className="text-red-500 mb-4">No se pudo conectar con el servidor</p>
         <button 
           onClick={() => window.location.reload()} 
           className="border-2 bg-[#F8F9FA] p-2 text-[#181616] text-sm rounded"
@@ -116,14 +87,14 @@ function Registro() {
   return (
     <section className="flex flex-row justify-center">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 items-center justify-center h-screen">
-        <h1 className="text-xl font-semibold">Registro</h1>
+        <h1 className="text-xl font-semibold">Iniciar Sesión</h1>
         {status.type && (
           <p className={`text-${status.type === 'error' ? 'red' : 'green'}-500 text-sm`}>
             {status.message}
           </p>
         )}
         <div className="flex flex-col">
-          <label htmlFor="username" className="mb-1">Crea tu nickname</label>
+          <label htmlFor="username" className="mb-1">Nickname</label>
           <input 
             type="text" 
             id="username" 
@@ -133,22 +104,6 @@ function Registro() {
             className="border-2 border-gray-300 rounded-sm bg-transparent p-1 font-light" 
             required
             disabled={isLoading}
-            minLength={3}
-            placeholder="Mínimo 3 caracteres"
-          />
-        </div>
-        <div className="flex flex-col">
-          <label htmlFor="email" className="mb-1">Email</label>
-          <input 
-            type="email" 
-            id="email" 
-            name="email"
-            value={formData.email}
-            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-            className="border-2 border-gray-300 rounded-sm bg-transparent p-1 font-light" 
-            required
-            disabled={isLoading}
-            placeholder="ejemplo@correo.com"
           />
         </div>
         <div className="flex flex-col">
@@ -163,8 +118,6 @@ function Registro() {
               className="border-2 border-gray-300 rounded-sm bg-transparent p-1 font-light w-full"
               required
               disabled={isLoading}
-              minLength={6}
-              placeholder="Mínimo 6 caracteres"
             />
             <button
               type="button"
@@ -181,12 +134,12 @@ function Registro() {
           className='border-2 bg-[#F8F9FA] p-1 text-[#181616] text-sm'
           disabled={isLoading}
         >
-          {isLoading ? 'Registrando...' : 'Registrarse'}
+          {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
         </button>
-        <p className="text-sm text-gray-500">¿Ya tienes cuenta? <a href="/" className="text-[#F8F9FA]">Inicia sesión</a></p>
+        <p className="text-sm text-gray-500">¿No tienes cuenta? <a href="/registro" className="text-[#F8F9FA]">Regístrate</a></p>
       </form>
     </section>
   );
 }
 
-export default Registro;
+export default InicioSesion;
