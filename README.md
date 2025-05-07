@@ -1,35 +1,42 @@
 # Proyecto Juegos
 
-## Descripción
-Este proyecto contiene una colección de juegos desarrollados como parte de un ejercicio de programación.
-
-## Objetivo
-Crear y mantener una biblioteca de juegos simples para demostrar conceptos de programación y proporcionar entretenimiento mientras se practican habilidades de codificación.
-
-## Estructura del Proyecto
-```
-/Juegos
-├── README.md
-└── [se agregarán juegos aquí]
-```
+## Tecnologías
+- Frontend: React + TypeScript
+- Estilos: Tailwind CSS
+- API Client: Axios
+- Routing: React Router
 
 ## Requisitos
-- Lenguaje de programación (por determinar)
-- Configuración del entorno de desarrollo
-- Dependencias (se listarán por juego)
+- Node.js (v16 o superior)
+- npm o yarn
+- Servidor backend corriendo en localhost:5000
 
 ## Instalación
 1. Clonar el repositorio
-2. Instalar dependencias requeridas
-3. Seguir instrucciones específicas de cada juego
+```bash
+git clone https://github.com/SmithAlon/frontend-juegos.git
+cd frontend-juegos
+```
 
-## Contribuir
-1. Hacer fork del repositorio
-2. Crear una rama de funcionalidad
-3. Enviar un pull request
+2. Instalar dependencias
+```bash
+npm install
+```
 
-## Licencia
-Licencia MIT
+3. Iniciar el proyecto
+```bash
+npm run dev
+```
 
-## Contacto
-Creado por [@smithalon]
+## Estructura del Proyecto
+```
+/frontend-juegos
+├── src/
+│   ├── components/    # Componentes reutilizables
+│   ├── pages/        # Páginas/rutas principales
+│   ├── api/          # Configuración de API client
+│   ├── types/        # Tipos TypeScript
+│   └── utils/        # Utilidades y helpers
+├── public/
+└── README.md
+```
