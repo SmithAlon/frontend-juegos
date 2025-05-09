@@ -34,8 +34,7 @@ export default function BotonJuego() {
       <button
         onClick={() => navigate(otherGame.path)}
         className={cn(
-          "border-2 bg-[#F8F9FA] p-1 text-[#181616] text-sm",
-          "hover:bg-gray-200 transition-colors duration-200"
+          "text-[#F8F9FA] text-sm",
         )}
       >
         Jugar {otherGame.name}

@@ -91,11 +91,6 @@ export default function MayorMenor() {
       <BotonJuego />
       <div className="flex flex-col items-center w-full max-w-sm px-4 py-8">
         <div className="flex flex-col items-center w-full mb-8">
-          <div className="flex items-center mb-6">
-            <h1 className="text-2xl font-bold">MAYOR O MENOR</h1>
-            <ChevronDown className="h-5 w-5 ml-1" />
-          </div>
-
           <div className="bg-zinc-800 rounded-md w-24 h-24 flex items-center justify-center mb-6">
             <span className="text-4xl font-bold">{currentNumber}</span>
           </div>

@@ -7,6 +7,7 @@ import { useAuth } from '../lib/auth/AuthContext';
 interface UserData {
   username: string;
   email: string;
+  phone: string;
   password: string;
 }
 
@@ -20,7 +21,8 @@ function Registro() {
   const [formData, setFormData] = useState<UserData>({
     username: '',
     email: '',
-    password: ''
+    password: '',
+    phone: ''
   });
   const [status, setStatus] = useState<{ type: 'error' | 'success' | null; message: string }>({ type: null, message: '' });
   const [isLoading, setIsLoading] = useState(false);
@@ -154,6 +156,19 @@ function Registro() {
             className="border-2 border-gray-300 rounded-sm bg-transparent p-1 font-light" 
             required
             disabled={isLoading}
+          />
+        </div>
+          <div>
+          <label htmlFor="phone" className="block text-sm font-medium text-gray-300">
+            Teléfono
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            value={formData.phone}
+            onChange={(e) => setFormData({...formData, phone: e.target.value})}
+            className="border-2 border-gray-300 rounded-sm bg-transparent p-1 font-light" 
+            required
           />
         </div>
         <div className="flex flex-col">

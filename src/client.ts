@@ -11,11 +11,6 @@ export const apiClient = axios.create({
 // Request interceptor for logging
 apiClient.interceptors.request.use(
   config => {
-    console.log('API Request:', {
-      method: config.method,
-      url: config.url,
-      data: config.data
-    });
     return config;
   },
   error => {

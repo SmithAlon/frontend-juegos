@@ -77,7 +77,7 @@ function InicioSesion() {
       const response = await apiClient.post<UserResponse>('/login', loginData);
       
       if (response.status === 200) {
-        console.log('Login successful:', response.data);
+        console.log('Login successful');
         
         setStatus({ type: 'success', message: response.data.message || 'Inicio de sesión exitoso' });
         login(response.data);

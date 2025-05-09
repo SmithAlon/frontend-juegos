@@ -8,7 +8,9 @@ export default function Inicio() {
       <div className="flex flex-col gap-4 items-center justify-center h-screen">
         <Titulo />
         <Selector />
-        <CerrarSesion />
+        <div className='mb-6'>
+          <CerrarSesion />
+        </div>
       </div>
     </section>
   );
