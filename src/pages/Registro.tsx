@@ -2,6 +2,7 @@ import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { useState, useEffect } from 'react';
 import { apiClient } from '../client';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../lib/auth/AuthContext';
 
 interface UserData {
   username: string;
@@ -25,6 +26,7 @@ function Registro() {
   const [isLoading, setIsLoading] = useState(false);
   const [isServerAvailable, setIsServerAvailable] = useState(true);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   useEffect(() => {
     const checkServerConnection = async () => {
@@ -42,8 +44,8 @@ function Registro() {
     if (!formData.username || !formData.email || !formData.password) {
       return 'Todos los campos son requeridos';
     }
-    if (formData.password.length < 6) {
-      return 'La contraseña debe tener al menos 6 caracteres';
+    if (formData.password.length < 8) {
+      return 'La contraseña debe tener al menos 8 caracteres';
     }
     if (formData.username.length < 3) {
       return 'El nombre de usuario debe tener al menos 3 caracteres';
@@ -62,7 +64,7 @@ function Registro() {
     if (!isServerAvailable) {
       setStatus({ 
         type: 'error', 
-        message: 'El servidor no está disponible. Por favor, verifica que el servidor esté corriendo en http://localhost:5000' 
+        message: 'El servidor no está disponible. Por favor, verifica que el servidor esté corriendo en http://localhost:8000' 
       });
       setIsLoading(false);
       return;
@@ -80,12 +82,18 @@ function Registro() {
       
       if (response.status === 201) {
         setStatus({ type: 'success', message: 'Usuario registrado exitosamente' });
-        localStorage.setItem('user', JSON.stringify(response.data));
-        setTimeout(() => navigate('/'), 2000);
+        login(response.data);
+        setTimeout(() => navigate('/inicio'), 2000);
       }
     } catch (err: any) {
-      setStatus({ type: 'error', message: err.message });
-      if (err.code === 'ERR_NETWORK') setIsServerAvailable(false);
+      let errorMessage = 'Error al registrar usuario';
+      if (err.response?.status === 400) {
+        errorMessage = err.response.data.detail || 'El nombre de usuario ya está registrado';
+      } else if (err.code === 'ERR_NETWORK') {
+        errorMessage = 'No se pudo conectar con el servidor';
+        setIsServerAvailable(false);
+      }
+      setStatus({ type: 'error', message: errorMessage });
     } finally {
       setIsLoading(false);
     }
@@ -95,12 +103,12 @@ function Registro() {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <h2 className="text-xl font-semibold mb-4">Servidor no disponible</h2>
-        <p className="text-red-500 mb-4">No se pudo conectar con el servidor en http://localhost:5000</p>
+        <p className="text-red-500 mb-4">No se pudo conectar con el servidor en http://localhost:8000</p>
         <p className="text-sm text-gray-500 mb-4">Asegúrate de que:</p>
         <ul className="text-sm text-gray-500 list-disc mb-4">
           <li>El servidor FastAPI esté corriendo</li>
           <li>MongoDB esté corriendo en el puerto 27017</li>
-          <li>El puerto 5000 esté disponible</li>
+          <li>El puerto 8000 esté disponible</li>
           <li>CORS esté configurado correctamente en el servidor</li>
         </ul>
         <button 
@@ -123,7 +131,7 @@ function Registro() {
           </p>
         )}
         <div className="flex flex-col">
-          <label htmlFor="username" className="mb-1">Crea tu nickname</label>
+          <label htmlFor="username" className="mb-1">Nickname</label>
           <input 
             type="text" 
             id="username" 
@@ -133,8 +141,6 @@ function Registro() {
             className="border-2 border-gray-300 rounded-sm bg-transparent p-1 font-light" 
             required
             disabled={isLoading}
-            minLength={3}
-            placeholder="Mínimo 3 caracteres"
           />
         </div>
         <div className="flex flex-col">
@@ -148,7 +154,6 @@ function Registro() {
             className="border-2 border-gray-300 rounded-sm bg-transparent p-1 font-light" 
             required
             disabled={isLoading}
-            placeholder="ejemplo@correo.com"
           />
         </div>
         <div className="flex flex-col">
@@ -163,8 +168,6 @@ function Registro() {
               className="border-2 border-gray-300 rounded-sm bg-transparent p-1 font-light w-full"
               required
               disabled={isLoading}
-              minLength={6}
-              placeholder="Mínimo 6 caracteres"
             />
             <button
               type="button"

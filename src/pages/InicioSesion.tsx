@@ -2,6 +2,7 @@ import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { useState, useEffect } from 'react';
 import { apiClient } from '../client';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../lib/auth/AuthContext';
 
 interface LoginData {
   username: string;
@@ -11,6 +12,7 @@ interface LoginData {
 interface UserResponse {
   username: string;
   email: string;
+  message: string;
 }
 
 function InicioSesion() {
@@ -23,6 +25,7 @@ function InicioSesion() {
   const [isLoading, setIsLoading] = useState(false);
   const [isServerAvailable, setIsServerAvailable] = useState(true);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   useEffect(() => {
     const checkServerConnection = async () => {
@@ -50,20 +53,55 @@ function InicioSesion() {
       return;
     }
 
+    // Validate form data
+    if (!formData.username || !formData.password) {
+      setStatus({ 
+        type: 'error', 
+        message: 'Por favor, completa todos los campos' 
+      });
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const response = await apiClient.post<UserResponse>('/login', formData);
+      const loginData = {
+        username: formData.username.trim(),
+        password: formData.password
+      };
+      
+      console.log('Sending login request with data:', {
+        username: loginData.username,
+        passwordLength: loginData.password.length
+      });
+
+      const response = await apiClient.post<UserResponse>('/login', loginData);
       
       if (response.status === 200) {
-        setStatus({ type: 'success', message: 'Inicio de sesión exitoso' });
-        localStorage.setItem('user', JSON.stringify(response.data));
+        console.log('Login successful:', response.data);
+        
+        setStatus({ type: 'success', message: response.data.message || 'Inicio de sesión exitoso' });
+        login(response.data);
         setTimeout(() => navigate('/inicio'), 2000);
       }
     } catch (err: any) {
+      console.error('Login error details:', {
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message
+      });
+      
+      let errorMessage = 'Error al iniciar sesión';
+      if (err.response?.status === 401) {
+        errorMessage = err.response.data.detail || 'Usuario o contraseña incorrectos';
+      } else if (err.code === 'ERR_NETWORK') {
+        errorMessage = 'No se pudo conectar con el servidor';
+        setIsServerAvailable(false);
+      }
+      
       setStatus({ 
         type: 'error', 
-        message: err.response?.data?.detail || 'Error al iniciar sesión' 
+        message: errorMessage
       });
-      if (err.code === 'ERR_NETWORK') setIsServerAvailable(false);
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +111,14 @@ function InicioSesion() {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <h2 className="text-xl font-semibold mb-4">Servidor no disponible</h2>
-        <p className="text-red-500 mb-4">No se pudo conectar con el servidor</p>
+        <p className="text-red-500 mb-4">No se pudo conectar con el servidor en http://localhost:8000</p>
+        <p className="text-sm text-gray-500 mb-4">Asegúrate de que:</p>
+        <ul className="text-sm text-gray-500 list-disc mb-4">
+          <li>El servidor FastAPI esté corriendo</li>
+          <li>MongoDB esté corriendo en el puerto 27017</li>
+          <li>El puerto 8000 esté disponible</li>
+          <li>CORS esté configurado correctamente en el servidor</li>
+        </ul>
         <button 
           onClick={() => window.location.reload()} 
           className="border-2 bg-[#F8F9FA] p-2 text-[#181616] text-sm rounded"

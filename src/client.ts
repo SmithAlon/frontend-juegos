@@ -8,10 +8,37 @@ export const apiClient = axios.create({
   }
 });
 
-// Interceptor para manejar errores
-apiClient.interceptors.response.use(
-  response => response,
+// Request interceptor for logging
+apiClient.interceptors.request.use(
+  config => {
+    console.log('API Request:', {
+      method: config.method,
+      url: config.url,
+      data: config.data
+    });
+    return config;
+  },
   error => {
+    console.error('API Request Error:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor for logging
+apiClient.interceptors.response.use(
+  response => {
+    console.log('API Response:', {
+      status: response.status,
+      data: response.data
+    });
+    return response;
+  },
+  error => {
+    console.error('API Response Error:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
     if (error.code === 'ERR_NETWORK') {
       console.error('Error de conexión: El servidor no está respondiendo');
     } else if (error.response) {
